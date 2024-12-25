@@ -40,6 +40,46 @@ body {
     }
 }
 
+@keyframes bounce {
+    0% {
+        transform: translateX(-32px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.toggle-sidebar-button {
+    animation-name: bounce;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-delay: 3s; 
+    appearance: none;
+    background-color: var(--claret);
+    border: 1px solid var(--white);
+    border-radius: 8px 0 0 8px;
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    font-family: "Lexend", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-size: 16px;
+    padding: 8px 12px;
+    position: fixed;
+    right: 0;
+    top: 64px;
+    z-index: 1;
+
+    svg {
+        width: 24px;
+
+        * {
+            stroke: var(--white);
+        }
+    }
+}
+
 .signs-grid {
     display: grid;
     grid-gap: var(--grid-gap);
@@ -56,6 +96,7 @@ body {
         flex-direction: column;
         list-style-type: none;
         overflow: hidden;
+        position: relative;
 
         .sign-header {
             border-bottom: 1px solid var(--black);
@@ -71,10 +112,49 @@ body {
                 font-style: normal;
                 line-height: 24px;
                 margin: 0;
-                padding: 8px 12px 4px;
+                padding: 8px 72px 4px 12px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+
+            .sign-actions {
+                display: flex;
+                padding: 8px 8px 4px;
+                position: absolute;
+                right: 0;
+                top: 0;
+
+                .sign-action {
+                    list-style-type: none;
+
+                    .sign-action-button {
+                        appearance: none;
+                        background-color: var(--white);
+                        border: 0;
+                        cursor: pointer;
+                        display: inline-block;
+                        margin-left: 4px;
+                        padding: 0;
+                        transform: scale(1);
+                        transition: all 150ms ease-in-out;
+
+                        &:hover {
+                            transform: scale(1.4);
+                        }
+
+                        svg {
+                            width: 24px
+                        }
+
+                        &.bookmarked {
+                            svg * {
+                                fill: var(--silver-lake-blue);
+                                stroke: var(--silver-lake-blue);
+                            }
+                        }
+                    }
+                }
             }
 
             .sign-regions {
