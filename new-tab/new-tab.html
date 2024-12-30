@@ -10,21 +10,118 @@
     <link rel="stylesheet" href="new-tab.css">
 </head>
 <body>
-    <div class="intro">
-        <h1>
-            Gebaren van de dag
-        </h1>
-        <span class="date"></span>
-    </div>
-    <button class="toggle-sidebar-button">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="18.74 3 18.74 21 11.97 14.33 5.27 20.94 5.27 3 18.74 3" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-        </svg>
-    </button>
-    <ul class="signs-grid"></ul>
+    <nav class="tabs-nav">
+        <ul class="tabs-list">
+            <li class="tab">
+                <input type="radio" name="tab" id="daily" checked/>
+                <label class="tab-label" for="daily">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z"/>
+                    </svg>
+                    Vandaag
+                </label>
+            </li>
+            <li class="tab">
+                <input type="radio" name="tab" class="tab" id="discover"/>
+                <label class="tab-label" for="discover">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/>
+                    </svg>
+                    Ontdekken
+                </label>
+            </li>
+            <li class="tab">
+                <input type="radio" name="tab" class="tab" id="bookmarked"/>
+                <label class="tab-label" for="bookmarked">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path d="M192,24H96A16,16,0,0,0,80,40V56H64A16,16,0,0,0,48,72V224a8,8,0,0,0,12.65,6.51L112,193.83l51.36,36.68A8,8,0,0,0,176,224V184.69l19.35,13.82A8,8,0,0,0,208,192V40A16,16,0,0,0,192,24ZM160,208.46l-43.36-31a8,8,0,0,0-9.3,0L64,208.45V72h96Zm32-32L176,165V72a16,16,0,0,0-16-16H96V40h96Z"/>
+                    </svg>
+                    Opgeslagen
+                </label>
+            </li>
+            <li class="tab">
+                <input type="radio" name="tab" class="tab" id="search"/>
+                <label class="tab-label" for="search">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/>
+                    </svg>
+                    Zoeken
+                </label>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <section class="daily active">
+            <div class="intro">
+                <h1 class="title">
+                    <span class="small">Gebaren van de dag</span>
+                    <span class="date"></span>
+                </h1>
+            </div>
+            <ul class="signs-grid daily-signs"></ul>
+        </section>
+    
+        <section class="discover">
+            <div class="intro">
+                <h1 class="title">
+                    Ontdek nieuwe gebaren
+                </h1>
+            </div>
+            <ul class="signs-grid discover-signs"></ul>
+        </section>
+    
+        <section class="bookmarked">
+            <div class="intro">
+                <h1 class="title">
+                    Opgeslagen gebaren
+                </h1>
+            </div>
+            <div class="empty-state bookmarks-empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path d="M184,34H72A14,14,0,0,0,58,48V224a6,6,0,0,0,9.18,5.09l60.81-38,60.83,38A6,6,0,0,0,198,224V48A14,14,0,0,0,184,34Zm2,179.17-54.83-34.26a6,6,0,0,0-6.36,0L70,213.17V48a2,2,0,0,1,2-2H184a2,2,0,0,1,2,2Z"></path>
+                </svg>
+                <p>
+                    Je hebt nog geen gebaren opgeslagen.
+                </p>
+                <p>
+                    Klik op het bladwijzericoon om een gebaar op te slaan.
+                </p>
+            </div>
+            <ul class="signs-grid bookmarked-signs"></ul>
+        </section>
+    
+        <section class="search">
+            <div class="intro">
+                <h1 class="title">
+                    Gebaren zoeken
+                </h1>
+                <div class="search">
+                    <input class="search-input" type="search" placeholder="Doorzoek meer dan 5600 woorden"/>
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                        <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="empty-state search-empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path d="M228.24,219.76l-51.38-51.38a86.15,86.15,0,1,0-8.48,8.48l51.38,51.38a6,6,0,0,0,8.48-8.48ZM38,112a74,74,0,1,1,74,74A74.09,74.09,0,0,1,38,112Z"></path>
+                </svg>
+                <p>
+                    Je hebt nog geen gebaren opgeslagen.
+                </p>
+                <p>
+                    Klik op het bladwijzericoon om een gebaar op te slaan.
+                </p>
+            </div>
+            <ul class="signs-grid search-results"></ul>
+        </section>
+    </main>
+
     <footer>
         Alle getoonde data en beeldmateriaal zijn eigendom van <i>Vlaams GebarentaalCentrum vzw</i>.
         <!-- https://www.freepik.com/free-vector/hand-drawn-retro-cartoon-hand-feet-illustration_70004193.htm#fromView=serie&position=6&new_detail=true -->
+        <!-- https://phosphoricons.com/ -->
     </footer>
     <script src="new-tab.js"></script>
 </body>
