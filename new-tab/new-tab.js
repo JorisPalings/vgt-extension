@@ -1,12 +1,17 @@
 // TODO: Add settings as popup
-// TODO: Implement info pop-ups
-// TODO: Add "Load more" button to discover tab
 // TODO: Fix grid for <3 signs
-// TODO: Show empty states when relevant
 // TODO: Make the distinction between "words" and "signs"
+// TODO: Suggest similar words when no search results are found
+// TODO: Reset dialog content when closing
+// TODO: Add selected region indication to info popup
+// TODO: Add categories, handsigns and locations to info popup
 
 let signs = []
 let selectedSigns = []
+let totalNoOfSigns = 5600
+const noOfDailySigns = 1
+const noOfDiscoverSigns = 1
+const noOfSearchResultsToShow = 9
 
 function showTab(tabId) {
     ;[...document.querySelectorAll(`section`)].forEach(section => section.classList.remove('active'))
@@ -54,10 +59,10 @@ async function renderSignsGrid(signs, signsGridElement) {
                     <ul class="sign-actions">
                         <li class="sign-action">
                             <button class="sign-action-button bookmark">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                                <path class="fill" d="M192,48V224l-64-40L64,224V48a8,8,0,0,1,8-8H184A8,8,0,0,1,192,48Z"/>
-                                <path class="stroke" d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"/>
-                            </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                    <path class="fill" d="M192,48V224l-64-40L64,224V48a8,8,0,0,1,8-8H184A8,8,0,0,1,192,48Z"/>
+                                    <path class="stroke" d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"/>
+                                </svg>
                             </button>
                         </li>
                         <li class="sign-action">
@@ -88,13 +93,38 @@ async function renderSignsGrid(signs, signsGridElement) {
         })
     
         ;[...document.querySelectorAll(`.sign[data-sign-gloss-name="${sign.g}"] .sign-action-button.info`)].forEach(button => {
-            button.addEventListener('click', showSignInfoPopup)
+            button.addEventListener('click', (event) => showSignInfoPopup(event, sign))
         })
     
         ;[...document.querySelectorAll(`.sign[data-sign-gloss-name="${sign.g}"] .sign-region-select`)].forEach(select => {
             select.addEventListener('click', showRegionalSign)
         })
     }))
+}
+
+function showRandomUnknownSign() {
+    // Filter out bookmarked (already known) signs
+    const knownSigns = getBookmarkedSigns()
+    const unknownSigns = signs.filter(sign => {
+        return !knownSigns.map(knownSign => knownSign.g).includes(sign.g)
+    })
+
+    // Select random signs from the unknown signs
+    const selectedSigns = []
+    const selectedSignsGlossNames = []
+    let noOfRandomSigns = noOfDiscoverSigns
+    while(noOfRandomSigns > 0) {
+        let randomSign = unknownSigns[Math.floor(Math.random() * unknownSigns.length)]
+        if(!selectedSignsGlossNames.includes(randomSign.g)) {
+            selectedSigns.push(randomSign)
+            selectedSignsGlossNames.push(randomSign.g)
+            noOfRandomSigns --
+        }
+    }
+
+    // Render signs grid
+    const discoverSignsGrid = document.querySelector('.signs-grid.discover-signs')
+    renderSignsGrid(selectedSigns, discoverSignsGrid)
 }
 
 function getBookmarkedSigns() {
@@ -132,10 +162,7 @@ function toggleSignBookmark(event) {
         removeSignFromBookmarks(currentStoredBookmarks, signToToggle, signElement)
     }
 
-    const bookmarkedSigns = getBookmarkedSigns()
-    const bookmarkedSignsGrid = document.querySelector('.signs-grid.bookmarked-signs')
-    renderSignsGrid(bookmarkedSigns, bookmarkedSignsGrid)
-
+    updateBookmarkedTab()
     syncBookmarkedSignsWithStorage()
 }
 
@@ -163,10 +190,50 @@ function indicateBookmarkedStatus(signElement, bookmarked) {
     }
 }
 
-function showSignInfoPopup(event) {
+function showSignInfoPopup(event, sign) {
     const signElement = event.srcElement.closest('.sign')
-    const signGlossName = signElement.dataset.signGlossName
-    alert(`Show info popup for sign ${signGlossName}`)
+
+    const signInfoPopup = document.querySelector('.sign-info-popup')
+    signInfoPopup.showModal()
+
+    signInfoPopup.querySelector('.close-popup-button').addEventListener('click', () => {
+        signInfoPopup.close()
+    })
+
+    // Close popup when the backdrop is clicked
+    signInfoPopup.addEventListener('click', (event) => {
+        var rect = signInfoPopup.getBoundingClientRect();
+        var isClickInsideDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX && event.clientX <= rect.left + rect.width)
+        if (!isClickInsideDialog) signInfoPopup.close()
+    })
+    
+    const signName = signInfoPopup.querySelector('.sign-name')
+    signName.textContent = sign.t.join(', ')
+
+    const signRegionsList = signInfoPopup.querySelector('.sign-regions-list')
+    const signRegionListItems = sign.s.map((signSign, index) => {
+        const regions = signSign.r.map(region => {
+            if(region === '*') return 'Vlaanderen'
+            if(region === 'A') return 'Antwerpen'
+            if(region === 'O') return 'Oost-Vlaanderen'
+            if(region === 'W') return 'West-Vlaanderen'
+            if(region === 'V') return 'Vlaams-Brabant'
+            if(region === 'L') return 'Limburg'
+            if(region === '?') return 'Regio niet gekend'
+        })
+        return `<li class="sign-regions-list-item" data-sign-index=[${index}]>
+            <button>
+                ${regions.join(', ')}
+            </button>
+        </li>`
+    }).join('')
+    signRegionsList.insertAdjacentHTML('beforeend', signRegionListItems)
+
+    const signVideo = signInfoPopup.querySelector('.sign-video')
+    const signVideoSource = signInfoPopup.querySelector('.sign-video source')
+    signVideoSource.src = `https://vlaamsegebarentaal.be/signbank/dictionary/protected_media/glossvideo/${sign.s[0].v}-${sign.s[0].id}.mp4`
+    signVideo.load()
 }
 
 function showRegionalSign(event) {
@@ -190,19 +257,78 @@ function debounce(func, delay) {
     }
 }
 
-async function searchSigns(query, signs, resultsList) {
+function searchSigns(query, signs, resultsList) {
     const filteredSigns = signs.filter(sign => {
-        return sign.s.some(signSign => {
-            return signSign.t.some(translation => {
-                return translation.toLowerCase().includes(query.toLowerCase())
-            })
+        return sign.t.some(translation => {
+            return translation.toLowerCase().includes(query.toLowerCase())
         })
-    }).sort((signA, signB) => {
-        return signA.s[0].t[0].length - signB.s[0].t[0].length
-    })
-    .slice(0, 9)
+    }).sort((signA, signB) => signA.t[0].length - signB.t[0].length)
+        .slice(0, 9)
 
-    renderSignsGrid(filteredSigns, resultsList)
+    const noQueryEmptyState = document.querySelector('.empty-state.search-no-query')
+    const noResultsEmptyState = document.querySelector('.empty-state.search-no-results')
+
+    if(query.length === 0) {
+        noQueryEmptyState.classList.remove('hidden')
+        noResultsEmptyState.classList.add('hidden')
+        resultsList.classList.add('hidden')
+    } else {
+        if(filteredSigns.length === 0) {
+            noQueryEmptyState.classList.add('hidden')
+            noResultsEmptyState.classList.remove('hidden')
+            resultsList.classList.add('hidden')
+        } else {
+            noQueryEmptyState.classList.add('hidden')
+            noResultsEmptyState.classList.add('hidden')
+            resultsList.classList.remove('hidden')
+            renderSignsGrid(filteredSigns, resultsList)
+        }
+    }
+}
+
+function calculateLevenshteinDistance(left, right) {
+  if (left.length > right.length) [left, right] = [right, left]
+  let leftLength = left.length - 1
+  let rightLength = right.length - 1
+  while (leftLength > 0 && left.charCodeAt(leftLength) === right.charCodeAt(rightLength)) {
+    leftLength -= 1
+    rightLength -= 1
+  }
+  leftLength += 1
+  rightLength += 1
+  let start = 0
+  while (start < leftLength && left.charCodeAt(start) === right.charCodeAt(start)) {
+    start += 1
+  }
+  leftLength -= start
+  rightLength -= start
+  if (leftLength === 0) return rightLength
+  for (let i = 0; i < leftLength; i += 1) {
+    charCodeCache[i] = left.charCodeAt(start + i)
+    array[i] = i + 1
+  }
+  let bCharCode
+  let result
+  let temp
+  let temp2
+  let j = 0
+  while (j < rightLength) {
+    bCharCode = right.charCodeAt(start + j)
+    temp = j
+    j += 1
+    result = j
+    for (let i = 0; i < leftLength; i += 1) {
+      temp2 = temp + (bCharCode !== charCodeCache[i]) | 0
+      temp = array[i]
+      if (temp > result) {
+        array[i] = temp2 > result ? result + 1 : temp2
+      } else {
+        array[i] = temp2 > temp ? temp + 1 : temp2
+      }
+      result = array[i]
+    }
+  }
+  return result
 }
 
 function setupDailyTab(signs) {
@@ -222,7 +348,6 @@ function setupDailyTab(signs) {
     const dayOfTheWeek = new Date(today).getDay()
     hash += dayOfTheWeek * 123456
     const selectedIndices = []
-    const noOfDailySigns = 9
     for (let i = 0; i < noOfDailySigns; i ++) {
         const index = (Math.abs(hash + i * 789) % signs.length)
         if(!selectedIndices.includes(index)) {
@@ -236,48 +361,69 @@ function setupDailyTab(signs) {
     renderSignsGrid(selectedSigns, dailySignsGrid)
 }
 
-function setupDiscoverTab(signs) {
-    const knownSigns = getBookmarkedSigns()
-    const unknownSigns = signs.filter(sign => {
-        return !knownSigns.map(knownSign => knownSign.g).includes(sign.g)
+function setupDiscoverTab() {
+    const loadMoreSignsButton = document.querySelector('.load-more-signs-button')
+    const diceIconWrapper = loadMoreSignsButton.querySelector('.icon-wrapper')
+    const diceIcon = diceIconWrapper.querySelector('svg')
+    document.querySelector('.load-more-signs-button').addEventListener('click', () => {
+        // Run dice animation
+        diceIconWrapper.classList.add('bounce')
+        diceIcon.classList.add('spin')
+        setTimeout(() => {
+            diceIconWrapper.classList.remove('bounce')
+            diceIcon.classList.remove('spin')
+        }, 1000)
+
+        // Show a random unknown sign
+        showRandomUnknownSign()
     })
 
-    const selectedSigns = []
-    const selectedSignsGlossNames = []
-    let noOfRandomSigns = 9
-    while(noOfRandomSigns > 0) {
-        let randomSign = unknownSigns[Math.floor(Math.random() * unknownSigns.length)]
-        if(!selectedSignsGlossNames.includes(randomSign.g)) {
-            selectedSigns.push(randomSign)
-            selectedSignsGlossNames.push(randomSign.g)
-            noOfRandomSigns --
-        }
-    }
-    const discoverSignsGrid = document.querySelector('.signs-grid.discover-signs')
-    renderSignsGrid(selectedSigns, discoverSignsGrid)
+    showRandomUnknownSign()
 }
 
 function setupBookmarkedTab() {
+    updateBookmarkedTab()
+}
+
+function updateBookmarkedTab() {
     const bookmarkedSigns = getBookmarkedSigns()
+    const bookmarkedSignsEmptyState = document.querySelector('.empty-state.bookmarks-empty-state')
+    const bookmarkedSignsGrid = document.querySelector('.signs-grid.bookmarked-signs')
+
+    // Show/hide empty state
     if(bookmarkedSigns.length === 0) {
-        document.querySelector('.signs-grid.bookmarked-signs').classList.add('hidden')
+        bookmarkedSignsEmptyState.classList.remove('hidden')
+        bookmarkedSignsGrid.classList.add('hidden')
     } else {
-        document.querySelector('.bookmarks-empty-state').classList.add('hidden')
-        const bookmarkedSignsGrid = document.querySelector('.signs-grid.bookmarked-signs')
+        bookmarkedSignsEmptyState.classList.add('hidden')
+        bookmarkedSignsGrid.classList.remove('hidden')
         renderSignsGrid(bookmarkedSigns, bookmarkedSignsGrid)
     }
 }
 
 function setupSearchTab(signs) {
-    const totalNoOfSigns = signs.length
-    const searchInput = document.querySelector('.search-input')
+    totalNoOfSigns = signs.length
+    const randomSign = signs[Math.floor(Math.random() * signs.length)]
+    const randomSignName = randomSign.t[0].replaceAll(/ \(.*\)/g, '')
 
-    searchInput.placeholder = `Doorzoek ${totalNoOfSigns} woorden`
+    // Show the no query empty state with the total number of signs
+    const noQueryEmptyState = document.querySelector('.empty-state.search-no-query')
+    noQueryEmptyState.querySelector('.total-no-of-signs').innerText = totalNoOfSigns
+
+    // Show the no results found empty state with suggestions for related queries
+    const noResultsEmptyState = document.querySelector('.empty-state.search-no-results')
+    noResultsEmptyState.classList.add('hidden')
+    const noResultsSuggestion = noResultsEmptyState.querySelector('.no-results-suggestion')
+    // TODO: noResultsSuggestion.innerText = `Bedoelde je misschien`
+
+    const searchInput = document.querySelector('.search-input')
+    searchInput.placeholder = `Zoekterm (bv. '${randomSignName}')`
     const debouncedSearchSigns = debounce(searchSigns, 300)
 
     searchInput.addEventListener('input', (event) => {
         const searchResultsGrid = document.querySelector('.signs-grid.search-results')
         const query = event.target.value
+        document.querySelector('.empty-state.search-no-results .search-query').innerText = query
         debouncedSearchSigns(query, signs, searchResultsGrid)
     })
 }

@@ -1,3 +1,23 @@
+@keyframes bounce {
+    0%,30%,50%,to { transform: translateY(0) }
+    20% { transform: translateY(-12px) }
+    40% { transform: translateY(-7px) }
+}
+
+.bounce {
+    animation: bounce 1s ease-out 1
+}
+
+@keyframes spin {
+    0% { transform: rotate(0) }
+    20% { transform: rotate(200deg) }
+    80%,to { transform: rotate(540deg) }
+}
+
+.spin {
+    animation: spin 1s ease-out 1
+}
+
 :root {
     --white: #ffffff;
     --black: #000000;
@@ -8,7 +28,6 @@
     --claret: #820933;
     --grid-width: 1200px;
     --grid-gap: 24px;
-    --sidebar-width: 368px;
 }
 
 body {
@@ -26,6 +45,140 @@ body {
     min-height: 100vh;
 }
 
+.sign-info-popup {
+    border: 1px solid var(--black);
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    width: 640px;
+
+    &::backdrop {
+        background-color: rgba(from var(--silver-lake-blue) r g b / 25%);
+    }
+
+    .close-popup-button {
+        align-items: center;
+        background-color: transparent;
+        border: 1px solid var(--black);
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        height: 40px;
+        justify-content: center;
+        position: absolute;
+        right: -1px;
+        top: -1px;
+        transition: background-color 200ms ease-in-out;
+        width: 40px;
+
+        svg {
+            fill: var(--near-black);
+            transition: fill 200ms ease-in-out;
+            width: 24px;
+        }
+
+        &:hover {
+            background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
+
+            svg {
+                fill: var(--black);
+            }
+        }
+    }
+
+    .sign-header {
+        align-items: center;
+        display: flex;
+        margin-bottom: 8px;
+
+        .sign-action-button.bookmark {
+            background-color: transparent;
+            border: 0;
+            cursor: pointer;
+            margin-right: 4px;
+            padding: 0;
+    
+            svg {
+                width: 24px;
+            }
+
+            svg .fill {
+                fill: var(--white);
+                transition: all 100ms ease-in-out;
+            }
+
+            svg .stroke {
+                fill: var(--black);
+                transition: all 100ms ease-in-out;
+            }
+
+            &:hover, &:focus  {
+                outline: none;
+                
+                svg .stroke {
+                    fill: var(--silver-lake-blue);
+                }
+            }
+        }
+
+        .sign-name {
+            font-family: "Lexend", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
+            font-size: 24px;
+            font-style: normal;
+            line-height: 40px;
+            margin: 0;
+        }
+    }
+
+    .sign-info {
+        display: flex;
+
+        .sign-video {
+            margin-right: 8px;
+            width: 400px;
+        }
+
+        .sign-regions-list {
+            align-items: stretch;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin: 0;
+            padding: 0;
+
+            .sign-regions-list-item {
+                display: flex;
+                flex-direction: column;
+                justify-content: stretch;
+                list-style-type: none;
+                margin-bottom: 4px;
+
+                &:hover {
+                    background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
+                }
+
+                button {
+                    background-color: transparent;
+                    border: 0;
+                    color: var(--silver-lake-blue);
+                    cursor: pointer;
+                    display: block;
+                    font-family: "Lexend", sans-serif;
+                    font-optical-sizing: auto;
+                    font-weight: 500;
+                    font-size: 16px;
+                    font-style: normal;
+                    line-height: 24px;
+                    padding: 4px 12px;
+                    text-align: left;
+                }
+            }
+        }
+    }
+}
+
 .tabs-nav {
     align-items: center;
     display: flex;
@@ -35,11 +188,13 @@ body {
     &::after {
         background-color: var(--isabelline);
         content: '';
-        height: 480px;
+        height: 520px;
         left: 0;
-        position: absolute;
+        position: fixed;
         right: 0;
         top: 0;
+        transform: scale(1.5) rotate(-5deg);
+        transform-origin: center;
         z-index: -1;
     }
 
@@ -111,6 +266,8 @@ section {
 }
 
 .intro {
+    display: block;
+    height: 96px;
     margin-bottom: 64px;
     text-align: center;
 
@@ -122,7 +279,6 @@ section {
         font-size: 32px;
         font-style: normal;
         font-weight: 400;
-        height: 64px;
         justify-content: center;
         line-height: 40px;
         margin: 0;
@@ -134,11 +290,42 @@ section {
             font-size: 16px;
             font-style: normal;
             line-height: 24px;
+            margin-top: 8px;
+        }
+    }
+
+    .load-more-signs-button {
+        align-items: center;
+        background-color: var(--claret);
+        border: 0;
+        border-radius: 24px;
+        color: var(--white);
+        cursor: pointer;
+        display: inline-flex;
+        font-family: "Lexend", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-size: 16px;
+        font-style: normal;
+        line-height: 24px;
+        margin-top: 8px;
+        padding: 12px 24px 12px 20px;
+
+        .icon-wrapper {
+            align-items: center;
+            display: inline-flex;
+
+            svg {
+                fill: var(--white);
+                margin-right: 8px;
+                width: 24px;
+            }
         }
     }
 
     .search {
         display: inline-block;
+        margin-top: 8px;
         position: relative;
         
         .search-input {
@@ -155,16 +342,6 @@ section {
             padding: 0 16px 0 52px;
             transition: outline 200ms ease-in-out;
             width: 480px;
-
-            &::-ms-clear, &::-ms-reveal,
-            &::-webkit-search-decoration,
-            &::-webkit-search-cancel-button,
-            &::-webkit-search-results-button,
-            &::-webkit-search-results-decoration {
-                display: none;
-                width: 0;
-                height: 0;
-            }
 
             &:focus {
                 color: var(--black);
@@ -193,6 +370,7 @@ section {
 
 .empty-state {
     align-items: center;
+    color: var(--near-black);
     display: flex;
     flex-direction: column;
     margin-bottom: 64px;
@@ -206,19 +384,16 @@ section {
     }
 
     svg {
+        fill: var(--near-black);
         margin-bottom: 16px;
         width: 48px;
-
-        path {
-            stroke-width: 1px;
-        }
     }
 }
 
 .signs-grid {
     display: grid;
     grid-gap: var(--grid-gap);
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 480px));
     justify-content: center;
     margin: 0 auto 64px;
     padding: 0 24px;
@@ -339,6 +514,16 @@ section {
                 border-top: 1px solid var(--black);
                 display: flex;
                 position: relative;
+
+                &:hover {
+                    .sign-region-select-no-of-signs {
+                        color: var(--silver-lake-blue);
+                    }
+    
+                    svg {
+                        fill: var(--silver-lake-blue);
+                    }
+                }
     
                 .sign-region-select {
                     appearance: none;
@@ -354,6 +539,7 @@ section {
                     overflow: hidden;
                     padding: 4px 56px 4px 12px;
                     text-overflow: ellipsis;
+                    transition: color 100ms ease-in-out;
                     white-space: nowrap;
                     width: 100%;
     
@@ -362,9 +548,18 @@ section {
                         cursor: auto;
                         opacity: 1;
                     }
+
+                    &:not(:disabled):hover {
+                        color: var(--silver-lake-blue);
+
+                        option {
+                            color: var(--black);
+                        }
+                    }
     
                     &:focus {
-                        outline: 2px solid var(--silver-lake-blue);
+                        border-radius: 8px;
+                        outline: 1px solid var(--silver-lake-blue);
                         outline-offset: -4px;
                     }
                 }
@@ -387,9 +582,11 @@ section {
     
                     .sign-region-select-no-of-signs {
                         margin-left: 4px;
+                        transition: color 100ms ease-in-out;
                     }
     
                     svg {
+                        transition: fill 100ms ease-in-out;
                         width: 16px;
                     }
                 }
