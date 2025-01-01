@@ -1,10 +1,10 @@
 // TODO: Add settings as popup
 // TODO: Fix grid for <3 signs
 // TODO: Make the distinction between "words" and "signs"
-// TODO: Suggest similar words when no search results are found
 // TODO: Reset dialog content when closing
 // TODO: Add selected region indication to info popup
 // TODO: Add categories, handsigns and locations to info popup
+// TODO: Add link to sign detail page on the VGTC website
 
 let signs = []
 let selectedSigns = []
@@ -277,6 +277,33 @@ function searchSigns(query, signs, resultsList) {
             noQueryEmptyState.classList.add('hidden')
             noResultsEmptyState.classList.remove('hidden')
             resultsList.classList.add('hidden')
+
+            const similarSigns = signs
+                .map(sign => {
+                    const translations = sign.t
+                    const levenshteinDistances = translations.map(translation => calculateLevenshteinDistance(query.toLowerCase(), translation.toLowerCase()))
+                    const shortestLevenshteinDistance = Math.min(...levenshteinDistances)
+                    return {
+                        ...sign,
+                        d: shortestLevenshteinDistance
+                    }
+                })
+                .sort((signA, signB) => signA.d - signB.d)
+                .filter(sign => sign.d === 1)
+            let suggestion = 'Probeer eens een synoniem?'
+            if(similarSigns.length > 0) {
+                const suggestionLinks = similarSigns.map(similarSign => `<a class="suggested-sign-link">${similarSign.t.join(', ')}</a>`)
+                const formattedLinks = new Intl.ListFormat('nl-BE', { type: "disjunction" }).format(suggestionLinks)
+                suggestion = `Bedoelde je misschien ${formattedLinks}?`
+            }
+            const noResultsSuggestion = document.querySelector('.no-results-suggestion')
+            noResultsSuggestion.innerHTML = suggestion
+            ;[...noResultsSuggestion.querySelectorAll('.suggested-sign-link')].forEach(suggestedSignLink => {
+                suggestedSignLink.addEventListener('click', (event) => {
+                    document.querySelector('.search-input').value = event.target.innerText
+                    searchSigns(event.target.innerText, signs, resultsList)
+                })
+            })
         } else {
             noQueryEmptyState.classList.add('hidden')
             noResultsEmptyState.classList.add('hidden')
@@ -287,48 +314,50 @@ function searchSigns(query, signs, resultsList) {
 }
 
 function calculateLevenshteinDistance(left, right) {
-  if (left.length > right.length) [left, right] = [right, left]
-  let leftLength = left.length - 1
-  let rightLength = right.length - 1
-  while (leftLength > 0 && left.charCodeAt(leftLength) === right.charCodeAt(rightLength)) {
-    leftLength -= 1
-    rightLength -= 1
-  }
-  leftLength += 1
-  rightLength += 1
-  let start = 0
-  while (start < leftLength && left.charCodeAt(start) === right.charCodeAt(start)) {
-    start += 1
-  }
-  leftLength -= start
-  rightLength -= start
-  if (leftLength === 0) return rightLength
-  for (let i = 0; i < leftLength; i += 1) {
-    charCodeCache[i] = left.charCodeAt(start + i)
-    array[i] = i + 1
-  }
-  let bCharCode
-  let result
-  let temp
-  let temp2
-  let j = 0
-  while (j < rightLength) {
-    bCharCode = right.charCodeAt(start + j)
-    temp = j
-    j += 1
-    result = j
-    for (let i = 0; i < leftLength; i += 1) {
-      temp2 = temp + (bCharCode !== charCodeCache[i]) | 0
-      temp = array[i]
-      if (temp > result) {
-        array[i] = temp2 > result ? result + 1 : temp2
-      } else {
-        array[i] = temp2 > temp ? temp + 1 : temp2
-      }
-      result = array[i]
+    const array = []
+    const charCodeCache = []
+    if (left.length > right.length) [left, right] = [right, left]
+    let leftLength = left.length - 1
+    let rightLength = right.length - 1
+    while (leftLength > 0 && left.charCodeAt(leftLength) === right.charCodeAt(rightLength)) {
+        leftLength -= 1
+        rightLength -= 1
     }
-  }
-  return result
+    leftLength += 1
+    rightLength += 1
+    let start = 0
+    while (start < leftLength && left.charCodeAt(start) === right.charCodeAt(start)) {
+        start += 1
+    }
+    leftLength -= start
+    rightLength -= start
+    if (leftLength === 0) return rightLength
+    for (let i = 0; i < leftLength; i += 1) {
+        charCodeCache[i] = left.charCodeAt(start + i)
+        array[i] = i + 1
+    }
+    let bCharCode
+    let result
+    let temp
+    let temp2
+    let j = 0
+    while (j < rightLength) {
+        bCharCode = right.charCodeAt(start + j)
+        temp = j
+        j += 1
+        result = j
+        for (let i = 0; i < leftLength; i += 1) {
+            temp2 = temp + (bCharCode !== charCodeCache[i]) | 0
+            temp = array[i]
+            if (temp > result) {
+                array[i] = temp2 > result ? result + 1 : temp2
+            } else {
+                array[i] = temp2 > temp ? temp + 1 : temp2
+            }
+            result = array[i]
+        }
+    }
+    return result
 }
 
 function setupDailyTab(signs) {
@@ -413,8 +442,6 @@ function setupSearchTab(signs) {
     // Show the no results found empty state with suggestions for related queries
     const noResultsEmptyState = document.querySelector('.empty-state.search-no-results')
     noResultsEmptyState.classList.add('hidden')
-    const noResultsSuggestion = noResultsEmptyState.querySelector('.no-results-suggestion')
-    // TODO: noResultsSuggestion.innerText = `Bedoelde je misschien`
 
     const searchInput = document.querySelector('.search-input')
     searchInput.placeholder = `Zoekterm (bv. '${randomSignName}')`

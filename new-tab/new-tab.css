@@ -56,76 +56,62 @@ body {
         background-color: rgba(from var(--silver-lake-blue) r g b / 25%);
     }
 
-    .close-popup-button {
+    .sign-popup-header {
         align-items: center;
-        background-color: transparent;
-        border: 1px solid var(--black);
+        border-bottom: 1px solid var(--black);
         box-sizing: border-box;
-        cursor: pointer;
         display: flex;
         height: 40px;
         justify-content: center;
-        position: absolute;
-        right: -1px;
-        top: -1px;
-        transition: background-color 200ms ease-in-out;
-        width: 40px;
+        position: relative;
 
-        svg {
-            fill: var(--near-black);
-            transition: fill 200ms ease-in-out;
-            width: 24px;
-        }
-
-        &:hover {
-            background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
-
-            svg {
-                fill: var(--black);
-            }
-        }
-    }
-
-    .sign-header {
-        align-items: center;
-        display: flex;
-        margin-bottom: 8px;
-
-        .sign-action-button.bookmark {
+        .sign-popup-header-button {
+            align-items: center;
             background-color: transparent;
-            border: 0;
+            border: none;
+            box-sizing: border-box;
             cursor: pointer;
-            margin-right: 4px;
+            display: flex;
+            justify-content: center;
             padding: 0;
+            position: absolute;
+            transition: background-color 200ms ease-in-out;
+            width: 40px;
     
             svg {
+                fill: var(--near-black);
+                transition: fill 200ms ease-in-out;
                 width: 24px;
             }
-
-            svg .fill {
-                fill: var(--white);
-                transition: all 100ms ease-in-out;
-            }
-
-            svg .stroke {
-                fill: var(--black);
-                transition: all 100ms ease-in-out;
-            }
-
-            &:hover, &:focus  {
-                outline: none;
-                
-                svg .stroke {
-                    fill: var(--silver-lake-blue);
+    
+            &:hover {
+                background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
+    
+                svg {
+                    fill: var(--black);
                 }
             }
-        }
 
+            &.bookmark-sign-button {
+                border-right: 1px solid var(--black);
+                bottom: 0px;
+                left: 0px;
+                top: 0px;
+            }
+
+            &.close-popup-button {
+                border-left: 1px solid var(--black);
+                bottom: 0px;
+                right: 0px;
+                top: 0px;
+            }
+        }
+    
         .sign-name {
             font-family: "Lexend", sans-serif;
             font-optical-sizing: auto;
             font-weight: 500;
-            font-size: 24px;
+            font-size: 18px;
             font-style: normal;
             line-height: 40px;
             margin: 0;
@@ -193,8 +179,6 @@ body {
         position: fixed;
         right: 0;
         top: 0;
-        transform: scale(1.5) rotate(-5deg);
-        transform-origin: center;
         z-index: -1;
     }
 
@@ -373,7 +357,9 @@ section {
     color: var(--near-black);
     display: flex;
     flex-direction: column;
-    margin-bottom: 64px;
+    margin: 0 auto 64px;
+    max-width: 560px;
+    text-align: center;
 
     &.hidden {
         display: none;
@@ -387,6 +373,13 @@ section {
         fill: var(--near-black);
         margin-bottom: 16px;
         width: 48px;
+    }
+
+    .suggested-sign-link {
+        color: var(--silver-lake-blue);
+        cursor: pointer;
+        font-style: italic;
+        text-decoration: underline;
     }
 }
 
