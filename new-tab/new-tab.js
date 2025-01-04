@@ -194,18 +194,32 @@ function showSignInfoPopup(event, sign) {
     const signElement = event.srcElement.closest('.sign')
 
     const signInfoPopup = document.querySelector('.sign-info-popup')
-    signInfoPopup.showModal()
 
-    signInfoPopup.querySelector('.close-popup-button').addEventListener('click', () => {
-        signInfoPopup.close()
-    })
+    signInfoPopup.insertAdjacentHTML('beforeend', `
+        <div class="sign-popup-header">
+            <button class="sign-popup-header-button bookmark-sign-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path class="fill" d="M192,48V224l-64-40L64,224V48a8,8,0,0,1,8-8H184A8,8,0,0,1,192,48Z"/>
+                    <path class="stroke" d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"/>
+                </svg>
+            </button>
+            <h2 class="sign-name"></h2>
+            <button class="sign-popup-header-button close-popup-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                    <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="sign-info">
+            <video autoplay loop muted class="sign-video">
+                <source type="video/mp4" />
+            </video>
+            <ul class="sign-regions-list"></ul>
+        </div>
+    `)
 
-    // Close popup when the backdrop is clicked
-    signInfoPopup.addEventListener('click', (event) => {
-        var rect = signInfoPopup.getBoundingClientRect();
-        var isClickInsideDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
-          rect.left <= event.clientX && event.clientX <= rect.left + rect.width)
-        if (!isClickInsideDialog) signInfoPopup.close()
+    signInfoPopup.querySelector('.bookmark-sign-button').addEventListener('click', () => {
+        // TODO: make toggleSignBookmark work with sign popups
     })
     
     const signName = signInfoPopup.querySelector('.sign-name')
@@ -234,6 +248,25 @@ function showSignInfoPopup(event, sign) {
     const signVideoSource = signInfoPopup.querySelector('.sign-video source')
     signVideoSource.src = `https://vlaamsegebarentaal.be/signbank/dictionary/protected_media/glossvideo/${sign.s[0].v}-${sign.s[0].id}.mp4`
     signVideo.load()
+
+    
+    signInfoPopup.showModal()
+
+    signInfoPopup.querySelector('.close-popup-button').addEventListener('click', () => {
+        signInfoPopup.close()
+        signInfoPopup.innerHTML = ''
+    })
+
+    // Close popup when the backdrop is clicked
+    signInfoPopup.addEventListener('click', (event) => {
+        var rect = signInfoPopup.getBoundingClientRect();
+        var isClickInsidePopup = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX && event.clientX <= rect.left + rect.width)
+        if (!isClickInsidePopup) {
+            signInfoPopup.close()
+            signInfoPopup.innerHTML = ''
+        }
+    })
 }
 
 function showRegionalSign(event) {
