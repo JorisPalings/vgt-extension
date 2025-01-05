@@ -75,35 +75,75 @@ body {
             justify-content: center;
             padding: 0;
             position: absolute;
-            transition: background-color 200ms ease-in-out;
+            transition: background-color 100ms ease-in-out;
             width: 40px;
     
             svg {
                 fill: var(--near-black);
-                transition: fill 200ms ease-in-out;
+                transition: fill 100ms ease-in-out;
                 width: 24px;
             }
     
             &:hover {
                 background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
-    
-                svg {
-                    fill: var(--black);
-                }
             }
 
-            &.bookmark-sign-button {
+            &.bookmark {
                 border-right: 1px solid var(--black);
                 bottom: 0px;
                 left: 0px;
                 top: 0px;
+
+                &:focus {
+                    outline: 1px solid var(--silver-lake-blue);
+                    outline-offset: -4px;
+                }
+
+                svg {
+                    .fill {
+                        fill: var(--white);
+                        transition: fill 100ms ease-in-out;
+                    }
+                    .stroke {
+                        fill: var(--black);
+                        transition: fill 100ms ease-in-out;
+                    }
+                }
+
+                &:hover {
+                    svg {
+                        .stroke {
+                            fill: var(--silver-lake-blue);
+                        }
+                    }
+                }
             }
 
-            &.close-popup-button {
+            &.bookmarked {
+                svg .fill, svg .stroke {
+                    fill: var(--silver-lake-blue);
+                }
+            }
+
+            &.close-popup {
                 border-left: 1px solid var(--black);
                 bottom: 0px;
                 right: 0px;
                 top: 0px;
+
+                &:focus {
+                    outline: 1px solid var(--silver-lake-blue);
+                    outline-offset: -4px;
+                }
+
+                &:hover svg {
+                    fill: var(--silver-lake-blue);
+                }
+
+                svg {
+                    fill: var(--black);
+                    transition: fill 100ms ease-in-out;
+                }
             }
         }
     
@@ -420,35 +460,42 @@ section {
                 font-style: normal;
                 line-height: 24px;
                 margin: 0;
-                padding: 8px 72px 4px 12px;
+                padding: 8px 72px 8px 12px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
     
             .sign-actions {
+                align-items: center;
                 display: flex;
-                padding: 8px 8px 4px;
+                height: 40px;
+                margin-right: 8px;
                 position: absolute;
                 right: 0;
                 top: 0;
     
                 .sign-action {
+                    height: 24px;
                     list-style-type: none;
+                    margin-left: 4px;
     
                     .sign-action-button {
                         appearance: none;
                         background-color: var(--white);
                         border: 0;
+                        border-radius: 4px;
                         cursor: pointer;
-                        display: inline-block;
-                        margin-left: 4px;
+                        height: 24px;
                         padding: 0;
                         transform: scale(1);
                         transition: all 150ms ease-in-out;
     
-                        &:hover, &:focus {
-                            outline: none;
+                        &:focus {
+                            outline: 1px solid var(--silver-lake-blue);
+                        }
+                        
+                        &:hover {
                             transform: scale(1.4);
                         }
     
@@ -470,8 +517,6 @@ section {
                             }
     
                             &:hover, &:focus  {
-                                outline: none;
-                                
                                 svg .stroke {
                                     fill: var(--silver-lake-blue);
                                 }
@@ -485,8 +530,6 @@ section {
                             }
     
                             &:hover, &:focus {
-                                outline: none;
-
                                 svg {
                                     fill: var(--silver-lake-blue);
                                 }
