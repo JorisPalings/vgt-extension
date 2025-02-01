@@ -2,9 +2,6 @@
 // TODO: Set preferred region(s)
 // TODO: Fix grid for <3 signs
 // TODO: Make the distinction between "words" and "signs"
-// TODO: Reset dialog content when closing
-// TODO: Add selected region indication to info popup
-// TODO: Add categories, handsigns and locations to info popup
 // TODO: Add link to sign detail page on the VGTC website
 
 let signs = []
@@ -67,11 +64,11 @@ async function renderSignsGrid(signs, signsGridElement) {
                             </button>
                         </li>
                         <li class="sign-action">
-                            <button class="sign-action-button info">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                                <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/>
-                            </svg>
-                            </button>
+                            <a class="sign-action-button info" href="https://woordenboek.vlaamsegebarentaal.be/gloss/${sign.g}?sid=${sign.s[0].id}" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"/>
+                                </svg>
+                            </a>
                         </li>
                     </ul>
                     <div class="sign-regions">
@@ -96,10 +93,6 @@ async function renderSignsGrid(signs, signsGridElement) {
                 const signToToggle = signs.find(sign => sign.g === signGlossName)
                 toggleSignBookmark(signToToggle, signElement)
             })
-        })
-    
-        ;[...document.querySelectorAll(`.sign[data-sign-gloss-name="${sign.g}"] .sign-action-button.info`)].forEach(button => {
-            button.addEventListener('click', (event) => showSignInfoPopup(event, sign))
         })
     
         ;[...document.querySelectorAll(`.sign[data-sign-gloss-name="${sign.g}"] .sign-region-select`)].forEach(select => {
@@ -168,7 +161,7 @@ function toggleSignBookmark(signToToggle, signElement) {
 
 function bookmarkSign(currentStoredBookmarks, signToBookmark, signElement) {
     const newStoredBookmarks = currentStoredBookmarks
-    newStoredBookmarks.push(signToBookmark)
+    newStoredBookmarks.unshift(signToBookmark)
     localStorage.setItem('bookmarkedSigns', JSON.stringify(newStoredBookmarks))
 
     indicateBookmarkedStatus(signElement, true)
@@ -190,88 +183,14 @@ function indicateBookmarkedStatus(signElement, bookmarked) {
     }
 }
 
-function showSignInfoPopup(event, sign) {
-    const signInfoPopup = document.querySelector('.sign-info-popup')
-
-    signInfoPopup.insertAdjacentHTML('beforeend', `
-        <div class="sign-popup-header">
-            <button class="sign-popup-header-button bookmark">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                    <path class="fill" d="M192,48V224l-64-40L64,224V48a8,8,0,0,1,8-8H184A8,8,0,0,1,192,48Z"/>
-                    <path class="stroke" d="M184,32H72A16,16,0,0,0,56,48V224a8,8,0,0,0,12.24,6.78L128,193.43l59.77,37.35A8,8,0,0,0,200,224V48A16,16,0,0,0,184,32Zm0,177.57-51.77-32.35a8,8,0,0,0-8.48,0L72,209.57V48H184Z"/>
-                </svg>
-            </button>
-            <h2 class="sign-name"></h2>
-            <button class="sign-popup-header-button close-popup">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-                    <path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"></path>
-                </svg>
-            </button>
-        </div>
-        <div class="sign-info">
-            <video autoplay loop muted class="sign-video">
-                <source type="video/mp4" />
-            </video>
-            <ul class="sign-regions-list"></ul>
-        </div>
-    `)
-
-    signInfoPopup.querySelector('.bookmark').addEventListener('click', () => {
-        toggleSignBookmark(sign, signInfoPopup)
-    })
-    
-    const signName = signInfoPopup.querySelector('.sign-name')
-    signName.textContent = sign.t.join(', ')
-
-    const signRegionsList = signInfoPopup.querySelector('.sign-regions-list')
-    const signRegionListItems = sign.s.map((signSign, index) => {
-        const regions = signSign.r.map(region => {
-            if(region === '*') return 'Vlaanderen'
-            if(region === 'A') return 'Antwerpen'
-            if(region === 'O') return 'Oost-Vlaanderen'
-            if(region === 'W') return 'West-Vlaanderen'
-            if(region === 'V') return 'Vlaams-Brabant'
-            if(region === 'L') return 'Limburg'
-            if(region === '?') return 'Regio niet gekend'
-        })
-        return `<li class="sign-regions-list-item" data-sign-index=[${index}]>
-            <button>
-                ${regions.join(', ')}
-            </button>
-        </li>`
-    }).join('')
-    signRegionsList.insertAdjacentHTML('beforeend', signRegionListItems)
-
-    const signVideo = signInfoPopup.querySelector('.sign-video')
-    const signVideoSource = signInfoPopup.querySelector('.sign-video source')
-    signVideoSource.src = `https://vlaamsegebarentaal.be/signbank/dictionary/protected_media/glossvideo/${sign.s[0].v}-${sign.s[0].id}.mp4`
-    signVideo.load()
-
-    
-    signInfoPopup.showModal()
-
-    signInfoPopup.querySelector('.close-popup').addEventListener('click', () => {
-        signInfoPopup.close()
-        signInfoPopup.innerHTML = ''
-    })
-
-    // Close popup when the backdrop is clicked
-    signInfoPopup.addEventListener('click', (event) => {
-        var rect = signInfoPopup.getBoundingClientRect();
-        var isClickInsidePopup = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
-          rect.left <= event.clientX && event.clientX <= rect.left + rect.width)
-        if (!isClickInsidePopup) {
-            signInfoPopup.close()
-            signInfoPopup.innerHTML = ''
-        }
-    })
-}
-
 function showRegionalSign(event) {
     const signElement = event.srcElement.closest('.sign')
     const signGlossName = signElement.dataset.signGlossName
     const selectedRegionIndex = event.srcElement.selectedIndex
     const matchingSelectedSign = signs.find(sign => sign.g === signGlossName)
+    
+    const infoButton = signElement.querySelector('.sign-action-button.info')
+    infoButton.href = `https://woordenboek.vlaamsegebarentaal.be/gloss/${signGlossName}?sid=${matchingSelectedSign.s[selectedRegionIndex].id}`
     
     const signVideoElement = signElement.querySelector('video')
     const signVideoSourceElement = signVideoElement.querySelector('source')
@@ -393,11 +312,12 @@ function calculateLevenshteinDistance(left, right) {
 
 function setupDailyTab(signs) {
     // Show date
-    document.querySelector('.date').textContent = new Intl.DateTimeFormat('nl-BE', {
+    const date = new Intl.DateTimeFormat('nl-BE', {
         weekday: 'long',
         day: 'numeric',
         month: 'long'
     }).format(new Date())
+    document.querySelector('.date').textContent = date[0].toUpperCase() + date.slice(1)
 
     // Select pseudo-random signs
     const today = new Date().toISOString().split('T')[0]

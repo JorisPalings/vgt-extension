@@ -45,170 +45,10 @@ body {
     min-height: 100vh;
 }
 
-.sign-info-popup {
-    border: 1px solid var(--black);
-    overflow: hidden;
-    padding: 0;
-    position: relative;
-    width: 640px;
-
-    &::backdrop {
-        background-color: rgba(from var(--silver-lake-blue) r g b / 25%);
-    }
-
-    .sign-popup-header {
-        align-items: center;
-        border-bottom: 1px solid var(--black);
-        box-sizing: border-box;
-        display: flex;
-        height: 40px;
-        justify-content: center;
-        position: relative;
-
-        .sign-popup-header-button {
-            align-items: center;
-            background-color: transparent;
-            border: none;
-            box-sizing: border-box;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            padding: 0;
-            position: absolute;
-            transition: background-color 100ms ease-in-out;
-            width: 40px;
-    
-            svg {
-                fill: var(--near-black);
-                transition: fill 100ms ease-in-out;
-                width: 24px;
-            }
-    
-            &:hover {
-                background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
-            }
-
-            &.bookmark {
-                border-right: 1px solid var(--black);
-                bottom: 0px;
-                left: 0px;
-                top: 0px;
-
-                &:focus {
-                    outline: 1px solid var(--silver-lake-blue);
-                    outline-offset: -4px;
-                }
-
-                svg {
-                    .fill {
-                        fill: var(--white);
-                        transition: fill 100ms ease-in-out;
-                    }
-                    .stroke {
-                        fill: var(--black);
-                        transition: fill 100ms ease-in-out;
-                    }
-                }
-
-                &:hover {
-                    svg {
-                        .stroke {
-                            fill: var(--silver-lake-blue);
-                        }
-                    }
-                }
-            }
-
-            &.bookmarked {
-                svg .fill, svg .stroke {
-                    fill: var(--silver-lake-blue);
-                }
-            }
-
-            &.close-popup {
-                border-left: 1px solid var(--black);
-                bottom: 0px;
-                right: 0px;
-                top: 0px;
-
-                &:focus {
-                    outline: 1px solid var(--silver-lake-blue);
-                    outline-offset: -4px;
-                }
-
-                &:hover svg {
-                    fill: var(--silver-lake-blue);
-                }
-
-                svg {
-                    fill: var(--black);
-                    transition: fill 100ms ease-in-out;
-                }
-            }
-        }
-    
-        .sign-name {
-            font-family: "Lexend", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 500;
-            font-size: 18px;
-            font-style: normal;
-            line-height: 40px;
-            margin: 0;
-        }
-    }
-
-    .sign-info {
-        display: flex;
-
-        .sign-video {
-            margin-right: 8px;
-            width: 400px;
-        }
-
-        .sign-regions-list {
-            align-items: stretch;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            margin: 0;
-            padding: 0;
-
-            .sign-regions-list-item {
-                display: flex;
-                flex-direction: column;
-                justify-content: stretch;
-                list-style-type: none;
-                margin-bottom: 4px;
-
-                &:hover {
-                    background-color: rgba(from var(--silver-lake-blue) r g b / 10%);
-                }
-
-                button {
-                    background-color: transparent;
-                    border: 0;
-                    color: var(--silver-lake-blue);
-                    cursor: pointer;
-                    display: block;
-                    font-family: "Lexend", sans-serif;
-                    font-optical-sizing: auto;
-                    font-weight: 500;
-                    font-size: 16px;
-                    font-style: normal;
-                    line-height: 24px;
-                    padding: 4px 12px;
-                    text-align: left;
-                }
-            }
-        }
-    }
-}
-
 .tabs-nav {
     align-items: center;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     margin-bottom: 64px;
 
     &::after {
@@ -220,6 +60,11 @@ body {
         right: 0;
         top: 0;
         z-index: -1;
+    }
+
+    .logo {
+        margin-bottom: 24px;
+        width: 120px;
     }
 
     .tabs-list {
@@ -486,10 +331,12 @@ section {
                         border: 0;
                         border-radius: 4px;
                         cursor: pointer;
+                        display: inline-block;
                         height: 24px;
                         padding: 0;
                         transform: scale(1);
                         transition: all 150ms ease-in-out;
+                        vertical-align: middle;
     
                         &:focus {
                             outline: 1px solid var(--silver-lake-blue);
